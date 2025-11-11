@@ -31,29 +31,37 @@ namespace RazorPagesMovie.Pages.Movies
 
         public async Task OnGetAsync()
         {
-            // <snippet_search_linqQuery>
+            // Get distinct genres for the dropdown
             IQueryable<string> genreQuery = from m in _context.Movie
                                             orderby m.Genre
                                             select m.Genre;
-            // </snippet_search_linqQuery>
 
+            // Start with all movies
             var movies = from m in _context.Movie
                          select m;
 
+            // Default: show only "Ghostbusters" when page loads
+            if (string.IsNullOrEmpty(SearchString) && string.IsNullOrEmpty(MovieGenre))
+            {
+                movies = movies.Where(m => m.Title == "Ghostbusters");
+            }
+
+            // Filter by Title if user enters something
             if (!string.IsNullOrEmpty(SearchString))
             {
                 movies = movies.Where(s => s.Title.Contains(SearchString));
             }
 
+            // Filter by Genre if user selects one
             if (!string.IsNullOrEmpty(MovieGenre))
             {
                 movies = movies.Where(x => x.Genre == MovieGenre);
             }
 
-            // <snippet_search_selectList>
+            // Populate the genre dropdown
             Genres = new SelectList(await genreQuery.Distinct().ToListAsync());
-            // </snippet_search_selectList>
+
             Movie = await movies.ToListAsync();
         }
-    }
-}
+    }  
+ }   
