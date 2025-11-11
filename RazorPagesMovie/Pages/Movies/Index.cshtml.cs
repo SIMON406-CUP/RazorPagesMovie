@@ -31,10 +31,14 @@ namespace RazorPagesMovie.Pages.Movies
 
         public async Task OnGetAsync()
         {
-            if (_context.Movie != null)
+            var movies = from m in _context.Movie
+                         select m;
+            if (!string.IsNullOrEmpty(SearchString))
             {
-                Movie = await _context.Movie.ToListAsync();
+                movies = movies.Where(s => s.Title.Contains(SearchString));
             }
+
+            Movie = await movies.ToListAsync();
         }
     }
 }
